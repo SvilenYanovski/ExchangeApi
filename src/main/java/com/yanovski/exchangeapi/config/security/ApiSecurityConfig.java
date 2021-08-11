@@ -2,8 +2,6 @@ package com.yanovski.exchangeapi.config.security;
 
 import com.yanovski.exchangeapi.entities.ApiKey;
 import com.yanovski.exchangeapi.services.ApiKeysService;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -23,10 +21,15 @@ import java.util.stream.Collectors;
 public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
     private final ApiKeysService apiKeysService;
 
-    @Value("${http.auth-token-header-name}")
-    private String principalRequestHeader;
+    @Value("${http.api-key-header}")
+    private String apiKeyHeader;
 
     private List<String> activeKeys;
+
+    private final static String[] SWAGGER_RESOURCES = {"/", "/csrf", "/v2/api-docs",
+            "/swagger-resources/configuration/ui", "/configuration/ui", "/swagger-resources",
+            "/swagger-resources/configuration/security", "/configuration/security",
+            "/swagger-ui.html", "/webjars/**"};
 
     public ApiSecurityConfig(ApiKeysService apiKeysService) {
         this.apiKeysService = apiKeysService;
@@ -41,20 +44,22 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        ApiAuthFilter filter = new ApiAuthFilter(principalRequestHeader);
+        ApiAuthFilter filter = new ApiAuthFilter(apiKeyHeader);
         filter.setAuthenticationManager(authentication -> {
             String principal = (String) authentication.getPrincipal();
             if (!activeKeys.contains(principal))
             {
-                throw new BadCredentialsException("The API key was not found or not the expected value.");
+                throw new BadCredentialsException("Invalid or missing api key.");
             }
             authentication.setAuthenticated(true);
             return authentication;
         });
-        httpSecurity.
-                antMatcher("/**").
-                csrf().disable().
-                sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).
+
+        httpSecurity.cors().and().csrf().disable()
+                .authorizeRequests()
+                //Swagger whitelist
+                .antMatchers(SWAGGER_RESOURCES).permitAll().and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).
                 and().addFilter(filter).authorizeRequests().anyRequest().authenticated();
     }
 }
