@@ -1,5 +1,6 @@
 package com.yanovski.exchangeapi.config.security;
 
+import com.yanovski.exchangeapi.dto.ApiKeyDto;
 import com.yanovski.exchangeapi.entities.ApiKey;
 import com.yanovski.exchangeapi.services.ApiKeysService;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,7 +39,7 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
     @PostConstruct
     public void init() {
         activeKeys = apiKeysService.getActiveApiKeys().stream()
-                .map(ApiKey::getApiKey)
+                .map(ApiKeyDto::getApiKey)
                 .collect(Collectors.toList());
     }
 

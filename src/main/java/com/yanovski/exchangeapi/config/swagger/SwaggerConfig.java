@@ -30,7 +30,7 @@ public class SwaggerConfig {
                 .parameterType("header")
                 .required(true)
                 .build();
-        
+
         List<Parameter> parameters = new ArrayList<>();
         parameters.add(parameterBuilder.build());
 
