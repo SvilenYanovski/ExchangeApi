@@ -1,20 +1,17 @@
 package com.yanovski.exchangeapi.client.impl;
 
 import com.yanovski.exchangeapi.client.ApiClient;
-import com.yanovski.exchangeapi.client.api_model.Currency;
 import com.yanovski.exchangeapi.client.api_model.CurrencyResponse;
 import com.yanovski.exchangeapi.client.api_model.RatesResponse;
-import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.List;
-
+@Slf4j
 @Component
 public class FixerApiClient implements ApiClient {
     @Value("${fixer.io.api-key}")
@@ -30,6 +27,7 @@ public class FixerApiClient implements ApiClient {
         String url = BASE_API + CURRENCIES;
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url).queryParam("access_key", apiKey);
 
+        log.info("Executing GET operation on URL: {}", builder.toUriString());
         ResponseEntity<CurrencyResponse> result = restTemplate.exchange(
                 builder.toUriString(),
                 HttpMethod.GET,
@@ -45,6 +43,7 @@ public class FixerApiClient implements ApiClient {
         String url = BASE_API + RATES;
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url).queryParam("access_key", apiKey);
 
+        log.info("Executing GET operation on URL: {}", builder.toUriString());
         ResponseEntity<RatesResponse> result = restTemplate.exchange(
                 builder.toUriString(),
                 HttpMethod.GET,

@@ -26,6 +26,10 @@ import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.*;
 
+/**
+ * Controller Advice providing generic error handling for some common web exceptions.
+ * The result is an ApiError class with structured error description.
+ */
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 @Slf4j

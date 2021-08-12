@@ -1,10 +1,8 @@
 package com.yanovski.exchangeapi.services.impl;
 
-import com.yanovski.exchangeapi.dto.ConversionDto;
 import com.yanovski.exchangeapi.dto.CurrencyDto;
 import com.yanovski.exchangeapi.dto.RateDto;
 import com.yanovski.exchangeapi.entities.ApiCurrency;
-import com.yanovski.exchangeapi.entities.ApiCurrencyConversion;
 import com.yanovski.exchangeapi.entities.ApiCurrencyRate;
 import com.yanovski.exchangeapi.repositories.ApiConversionRepository;
 import com.yanovski.exchangeapi.repositories.ApiCurrencyRepository;
@@ -28,7 +26,6 @@ public class CurrencyServiceImpl implements CurrencyService {
     private final ApiCurrencyRepository currencyRepository;
     private final CurrencyProxyService proxyService;
     private final ApiRatesRepository ratesRepository;
-    private final ApiConversionRepository conversionRepository;
 
     private final List<CurrencyDto> currenciesCache = new ArrayList<>();
 
@@ -79,40 +76,6 @@ public class CurrencyServiceImpl implements CurrencyService {
     public List<RateDto> getAllCurrencyRates(String code) {
         ApiCurrency currency = currencyRepository.findByCode(code);
         return ratesRepository.findAllByCurrency(currency).stream().map(RateDto::new).collect(Collectors.toList());
-    }
-
-    @Override
-    public ConversionDto createConversion(String fromCode, String toCode, String amount) {
-        LocalDateTime now = LocalDateTime.now();
-        ApiCurrency fromCurrency = currencyRepository.findByCode(fromCode);
-        ApiCurrencyRate fromRate = ratesRepository.findFirstByCurrencyOrderByCreatedAtDesc(fromCurrency);
-        ApiCurrency toCurrency = currencyRepository.findByCode(toCode);
-        ApiCurrencyRate toRate = ratesRepository.findFirstByCurrencyOrderByCreatedAtDesc(toCurrency);
-        Double amountToConvert = Double.parseDouble(amount);
-
-        Double xRate = toRate.getRate() / fromRate.getRate();
-        Double result = amountToConvert * xRate;
-
-        ApiCurrencyConversion conversion = ApiCurrencyConversion.builder()
-                .createdAt(now)
-                .queryFrom(fromCurrency.getCode())
-                .queryTo(toCurrency.getCode())
-                .queryAmount(amount)
-                .queryFromRateId(fromRate.getId())
-                .queryToRateId(toRate.getId())
-                .queryFromRateValue(fromRate.getRate().toString())
-                .queryToRateValue(toRate.getRate().toString())
-                .calculatedCrossRate(xRate.toString())
-                .calculatedResult(result.toString())
-                .build();
-        ApiCurrencyConversion created = conversionRepository.save(conversion);
-
-        return new ConversionDto(created);
-    }
-
-    @Override
-    public List<ConversionDto> getAllConversions() {
-        return conversionRepository.findAll().stream().map(ConversionDto::new).collect(Collectors.toList());
     }
 
     private void createCurrencies(List<CurrencyDto> currencies) {

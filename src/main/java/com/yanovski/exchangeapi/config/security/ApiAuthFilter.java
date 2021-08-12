@@ -3,6 +3,9 @@ package com.yanovski.exchangeapi.config.security;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * Filer to obtain security header
+ */
 public class ApiAuthFilter extends AbstractPreAuthenticatedProcessingFilter {
 
     private final String apiKeyHeader;

@@ -5,11 +5,9 @@ import com.yanovski.exchangeapi.dto.ApiKeyDto;
 import com.yanovski.exchangeapi.entities.ApiKey;
 import com.yanovski.exchangeapi.repositories.ApiKeysRepository;
 import com.yanovski.exchangeapi.services.ApiKeysService;
-import io.swagger.annotations.Api;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 

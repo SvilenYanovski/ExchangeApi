@@ -1,7 +1,6 @@
 package com.yanovski.exchangeapi.config.security;
 
 import com.yanovski.exchangeapi.dto.ApiKeyDto;
-import com.yanovski.exchangeapi.entities.ApiKey;
 import com.yanovski.exchangeapi.services.ApiKeysService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +15,11 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Security configuration providing authenticating via a header api-key.
+ * There are no privileges or claims, all active api-keys are treated the same.
+ * The api keys are stored into a DB table.
+ */
 @Configuration
 @EnableWebSecurity
 @Order(1)
@@ -27,6 +31,9 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private List<String> activeKeys;
 
+    /**
+     * These endpoints have to be accessed without authentication - they are related with the API Documentation Page
+     */
     private final static String[] SWAGGER_RESOURCES = {"/", "/csrf", "/v2/api-docs",
             "/swagger-resources/configuration/ui", "/configuration/ui", "/swagger-resources",
             "/swagger-resources/configuration/security", "/configuration/security",
@@ -36,6 +43,9 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
         this.apiKeysService = apiKeysService;
     }
 
+    /**
+     * We cache the active keys in order to improve performance and reduce the DB calls
+     */
     @PostConstruct
     public void init() {
         activeKeys = apiKeysService.getActiveApiKeys().stream()

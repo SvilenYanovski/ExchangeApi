@@ -6,6 +6,7 @@ import com.yanovski.exchangeapi.services.ApiKeysService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @RestController
 @AllArgsConstructor
 @Api(value="home", description="Exchange api documentation")
@@ -23,6 +25,7 @@ public class HomeController {
     @GetMapping("/")
     @ApiOperation(value = "Home endpoint, redirect to Swagger documentation.")
     public void redirect(HttpServletResponse response) throws IOException {
+        log.info("action=HomeController.redirect");
         response.sendRedirect("/swagger-ui.html");
     }
 
